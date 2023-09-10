@@ -1,11 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 # --- Entrenar perceptron ---
 def funcionActivacion(x):
     return 1 if x >= 0 else -1
 
 def entrenarPerceptron(XEntrenamiento, YEntrenamiento, tazaAprendizaje, epocas, iteracion):
+    # Generar pesos y bias
     pesos = np.random.rand(3)
     bias = np.random.rand(1)
     errores = []
@@ -29,6 +31,7 @@ def entrenarPerceptron(XEntrenamiento, YEntrenamiento, tazaAprendizaje, epocas, 
             errorTotal += np.abs(error)
         errores.append(errorTotal)
     
+    # Generar grafica de errores
     plt.plot(range(epocas), errores)
     plt.xlabel("Epoca")
     plt.ylabel("Error")
@@ -39,29 +42,36 @@ def entrenarPerceptron(XEntrenamiento, YEntrenamiento, tazaAprendizaje, epocas, 
 
 # --- Generar particiones y hacer pruebas ---
 def particiones(archivo, particiones):
+    # Guardar datos de archivo
     datos = np.genfromtxt(archivo, delimiter = ",")
     precisiones = []
 
+    # Separar datos de etiquetas
     X = datos[:, :3]
     Y = datos[:, 3]
 
     numeroDatos = X.shape[0]
     numeroCaracteristicas = X.shape[1]
 
+    # Definir tamaño de particiones
     tamEntrenamiento = int(0.8 * numeroDatos)
     tamPrueba = numeroDatos - tamEntrenamiento
 
     for i in range(particiones):
         print(f"ARCHIVO {archivo} PARTICION {i + 1}")
+        
+        # Hacer permutaciones aleatorias de los datos
         indices = np.random.permutation(numeroDatos)
         X = X[indices]
         Y = Y[indices]
 
+        # Seleccionar los primeros datos para entrenamiento y los demas para pruebas
         XEntrenamiento = X[:tamEntrenamiento]
         YEntrenamiento = Y[:tamEntrenamiento]
         XPrueba = X[tamEntrenamiento:]
         YPrueba = Y[tamEntrenamiento:]
 
+        # Entrenar perceptron
         pesos, bias = entrenarPerceptron(XEntrenamiento, YEntrenamiento, 0.1, 100, i)
 
         predicciones = []
@@ -82,7 +92,18 @@ def particiones(archivo, particiones):
 
         precisiones.append((prediccionesCorrectas / lenghtX) * 100)
 
-    
+        # Generar grafica 3D
+        figura = plt.figure()
+        grafica = figura.add_subplot(111, projection = "3d")
+        grafica.scatter(XPrueba[:, 0], XPrueba[:, 1], XPrueba[:, 2], c = YPrueba, cmap = "viridis", marker = "o")
+        grafica.set_xlabel('Eje X')
+        grafica.set_ylabel('Eje Y')
+        grafica.set_zlabel('Eje Z')
+        grafica.title("Separacion despues del entrenamiento")
+
+        plt.show()
+
+    # Asignar indices a las presiciones de cada particion
     resultados = [(i + 1, precision) for i, precision in enumerate(precisiones)]
 
     # Ordenar la lista de resultados por precision en orden descendente (de mejor a peor)
