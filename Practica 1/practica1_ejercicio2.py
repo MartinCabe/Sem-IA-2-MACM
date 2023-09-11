@@ -95,11 +95,12 @@ def particiones(archivo, particiones):
         # Generar grafica 3D
         figura = plt.figure()
         grafica = figura.add_subplot(111, projection = "3d")
-        grafica.scatter(XPrueba[:, 0], XPrueba[:, 1], XPrueba[:, 2], c = YPrueba, cmap = "viridis", marker = "o")
+        grafica.scatter(XPrueba[:, 0], XPrueba[:, 1], XPrueba[:, 2], c = predicciones, cmap = "viridis", marker = "o")
         grafica.set_xlabel('Eje X')
         grafica.set_ylabel('Eje Y')
         grafica.set_zlabel('Eje Z')
 
+        """
         # Generar linea de separacion
         point1 = np.array([0, 0, -(bias[0] / pesos[2])])
         point2 = np.array([1, 1, -((bias[0] + pesos[0] + pesos[1]) / pesos[2])])
@@ -109,6 +110,7 @@ def particiones(archivo, particiones):
         grafica.plot(XSeparacion, YSeparacion, ZSeparacion, c='g', label='Línea de separación')
         plt.title("Separacion despues del entrenamiento")
         plt.legend()
+        """
 
         plt.show()
 
