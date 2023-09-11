@@ -99,7 +99,16 @@ def particiones(archivo, particiones):
         grafica.set_xlabel('Eje X')
         grafica.set_ylabel('Eje Y')
         grafica.set_zlabel('Eje Z')
-        grafica.title("Separacion despues del entrenamiento")
+
+        # Generar linea de separacion
+        point1 = np.array([0, 0, -(bias[0] / pesos[2])])
+        point2 = np.array([1, 1, -((bias[0] + pesos[0] + pesos[1]) / pesos[2])])
+        XSeparacion = np.array([point1[0], point2[0]])
+        YSeparacion = np.array([point1[1], point2[1]])
+        ZSeparacion = np.array([point1[2], point2[2]])
+        grafica.plot(XSeparacion, YSeparacion, ZSeparacion, c='g', label='Línea de separación')
+        plt.title("Separacion despues del entrenamiento")
+        plt.legend()
 
         plt.show()
 
