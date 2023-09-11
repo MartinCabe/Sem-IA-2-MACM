@@ -99,6 +99,7 @@ def particiones(archivo, particiones):
         grafica.set_xlabel('Eje X')
         grafica.set_ylabel('Eje Y')
         grafica.set_zlabel('Eje Z')
+        plt.title("Separacion despues del entrenamiento")
 
         """
         # Generar linea de separacion
