@@ -2,13 +2,28 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-archivoEntrenamiento = np.genfromtxt("concentlite.csv", delimiter = ',')
-x_entrenamiento = archivoEntrenamiento[:, :2]
-y_entrenamiento = archivoEntrenamiento[:, 2]
+# Particionar datos, 80-20
+archivo = np.genfromtxt("concentlite.csv", delimiter = ',')
 
-archivoPrueba = np.genfromtxt("concentlite_tst.csv", delimiter = ',')
-x_prueba = archivoPrueba[:, :2]
-y_prueba = archivoPrueba[:, 2]
+x = archivo[:, :2]
+y = archivo[:, 2]
+
+numero_datos = x.shape[0]
+numero_caracteristicas = x.shape[1]
+
+tam_entrenamiento = int(0.8 * numero_datos)
+tam_prueba = numero_datos - tam_entrenamiento
+
+indices = np.random.permutation(numero_datos)
+
+x = x[indices]
+y = y[indices]
+
+x_entrenamiento = x[:tam_entrenamiento]
+y_entrenamiento = y[:tam_entrenamiento]
+
+x_prueba = x[tam_entrenamiento:]
+y_prueba = y[tam_entrenamiento:]
 
 # Declarar modelo, capas y funciones de activacion
 model = tf.keras.Sequential([
