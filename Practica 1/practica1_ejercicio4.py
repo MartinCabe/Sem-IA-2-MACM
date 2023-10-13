@@ -2,12 +2,17 @@ import numpy as np
 import tensorflow as tf
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import LeaveOneOut, LeavePOut
+from sklearn.preprocessing import StandardScaler
 
 # Cargar datos
 archivo = np.genfromtxt("irisbin.csv", delimiter = ',')
 
 x = archivo[:, :4]
 y = archivo[:, 4:]
+
+# Normalizar datos
+scaler = StandardScaler()
+x = scaler.fit_transform(x)
 
 # Hacer particion
 numero_datos = x.shape[0]
@@ -29,16 +34,30 @@ modelo = tf.keras.Sequential([
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.Dense(16, activation = 'relu'),
     tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Dropout(0.5),
     tf.keras.layers.Dense(8, activation = 'relu'),
     tf.keras.layers.BatchNormalization(),
     tf.keras.layers.Dense(8, activation = 'relu'),
     tf.keras.layers.Dense(3, activation = 'softmax')
 ])
 
-modelo.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
+optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+modelo.compile(optimizer = optimizer, loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
 # Entrenar modelo
 modelo.fit(x_entrenamiento, y_entrenamiento, epochs = 1000, verbose = 0)
+
+# Evaluar modelo
+loss, accuracy = modelo.evaluate(x_prueba, y_prueba)
+print(f"loss: {loss}, Accuracy: {accuracy}")
+
+# Probar modelo
+predictions = modelo.predict(x_prueba)
+
+# Resultados numericos
+print("Predicciones:")
+for i in range(len(predictions)):
+    print(f"Entrada: {x_prueba[i]}, Salida real: {y_prueba[i]}, Prediccion: {predictions[i]}")
 
 def evaluar_modelo(x, y, modelo):
     y_verdadera = np.argmax(y, axis = 1)
@@ -52,8 +71,8 @@ loo_accuracies = []
 for indice_entrenamiento, indice_prueba in loo.split(x):
     x_train, x_test = x[indice_entrenamiento], x[indice_prueba]
     y_train, y_test = y[indice_entrenamiento], y[indice_prueba]
-    model = tf.keras.models.clone_model(modelo)
-    acc = evaluar_modelo(x_test, y_test, model)
+    #model = tf.keras.models.clone_model(modelo)
+    acc = evaluar_modelo(x_test, y_test, modelo)
     loo_accuracies.append(acc)
 
 # Validar con Leave P Out
@@ -62,8 +81,8 @@ lpo_accuracies = []
 for indice_entrenamiento, indice_prueba in lpo.split(x):
     x_train, x_test = x[indice_entrenamiento], x[indice_prueba]
     y_train, y_test = y[indice_entrenamiento], y[indice_prueba]
-    model = tf.keras.models.clone_model(modelo)
-    acc = evaluar_modelo(x_test, y_test, model)
+    #model = tf.keras.models.clone_model(modelo)
+    acc = evaluar_modelo(x_test, y_test, modelo)
     lpo_accuracies.append(acc)
 
 # Calcular estadisticas
